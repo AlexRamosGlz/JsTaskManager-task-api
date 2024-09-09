@@ -1,5 +1,10 @@
 import express from 'express';
 import { commonsValidations } from 'JsTaskManager-commons-layer';
+import { list } from '../services/list.js';
+import { getById } from '../services/get.js';
+import { create } from '../services/create.js';
+import { update } from '../services/update.js';
+import { remove } from '../services/remove.js';
 
 const router = express.Router();
 
@@ -8,7 +13,7 @@ const router = express.Router();
  * GET
  */
 router.get('/', list);
-router.get('/:id', [commonsValidations.idPathParam], get);
+router.get('/:id', [commonsValidations.idPathParam], getById);
 
 
 /**
@@ -20,7 +25,7 @@ router.post('/', create);
 /**
  * PATCH 
  */
-router.patch('/:id', [commonsValidations.idPathParam], updated);
+router.patch('/:id', [commonsValidations.idPathParam], update);
 
 
 /**

@@ -1,8 +1,8 @@
 import { response, commonsConstants, successCodes, clientErrorCodes, awsRequestId, tasksConstants} from 'JsTaskManager-commons-layer'
 import { tasksQueries, Mysql } from 'JsTaskManager-mysql-layer';
-import { taskToDTO } from '../DTO/taskToDTO';
+import { taskToDTO } from '../DTO/taskToDTO.js';
 
-export const getById = async (req, res) => {
+export const update = async (req, res) => {
     try {
         const { taskId } = req.body; 
 

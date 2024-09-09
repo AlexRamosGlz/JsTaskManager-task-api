@@ -1,15 +1,14 @@
 import { response, commonsConstants, successCodes, clientErrorCodes, awsRequestId, tasksConstants} from 'JsTaskManager-commons-layer'
-import { tasksQueries, Mysql, Tasks} from 'JsTaskManager-mysql-layer';
-import { taskToDTO } from '../DTO/taskToDTO';
+import { tasksQueries, Mysql, Tasks, usersTasksQueries } from 'JsTaskManager-mysql-layer';
+import { taskToDTO } from '../DTO/taskToDTO.js';
 
-export const getById = async (req, res) => {
+export const create = async (req, res) => {
     try {
         const taskBody = {
             title: req.body.title,
             fullDescription: req.body.fullDescription,
             shortDescription: req.body.shortDescription,
             dueTo: req.body.dueTo,
-            assignee: req.body.assignee
         }
 
         const newTask = Tasks.createEntity(taskBody);
@@ -20,10 +19,15 @@ export const getById = async (req, res) => {
             newTask.fullDescription,
             newTask.shortDescription,
             newTask.dueTo,
-            newTask.assignee,
             newTask.createdAt,
             newTask.updatedAt
         ])
+
+         //TODO replace "username" to "id" by calling the getIdByUsername querie 
+         
+        const taskMaped = tasksToMap(req.body.assignees, newTask);
+        
+        await Mysql.execute(usersTasksQueries.add(taskMaped));
 
         const taskDTO = taskToDTO(newTask);
 
@@ -32,4 +36,10 @@ export const getById = async (req, res) => {
         console.error(`${tasksConstants.baseLog}${commonsConstants.LIST} ${commonsConstants.ERROR} ${error}`);
         response.error(res, req.awsRequestId, error, tasksConstants.TASK_NOT_CREATED, clientErrorCodes.BAD_REQUEST);
     }
+}
+
+const tasksToMap = (users, tasks) => {
+    return users.map(user => {
+       return `("${user}", "${tasks.id}", ${tasks.createdAt})`
+    })
 }
