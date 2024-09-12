@@ -18,7 +18,7 @@ export const update = async (req, res) => {
             fullDescription: req.body.fullDescription ?? task.fullDescription,
             shortDescription: req.body.shortDescription ?? task.shortDescription,
             dueTo: req.body.dueTo ?? task.dueTo,
-            assignee: req.body.assignee ?? task. assignee,
+            status: req.body.status ?? task.status,
             updatedAt: new Date()
         }
 
@@ -27,7 +27,7 @@ export const update = async (req, res) => {
             taskToUpdate.fullDescription,
             taskToUpdate.shortDescription,
             taskToUpdate.dueTo,
-            taskToUpdate.assignee,
+            taskToUpdate.status,
             taskToUpdate.updatedAt
         ])
 

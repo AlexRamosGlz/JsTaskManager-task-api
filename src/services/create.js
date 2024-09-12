@@ -13,18 +13,18 @@ export const create = async (req, res) => {
 
         const newTask = Tasks.createEntity(taskBody);
 
-        // await Mysql.execute(tasksQueries.add, [
-        //     newTask.id,
-        //     newTask.title,
-        //     newTask.fullDescription,
-        //     newTask.shortDescription,
-        //     newTask.dueTo,
-        //     newTask.createdAt,
-        //     newTask.updatedAt
-        // ])
+        await Mysql.execute(tasksQueries.add, [
+            newTask.id,
+            newTask.title,
+            newTask.fullDescription,
+            newTask.shortDescription,
+            newTask.dueTo,
+            newTask.status,
+            newTask.createdAt,
+            newTask.updatedAt
+        ])
 
-         //TODO test tasksToMap, once DB is up
-         
+        //TODO test tasksToMap, once DB is up 
         const taskMaped = tasksToMap(req.body.assignees, newTask);
         
         await Mysql.execute(usersTasksQueries.add(taskMaped));
