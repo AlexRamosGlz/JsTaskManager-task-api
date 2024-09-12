@@ -1,5 +1,5 @@
 import { response, commonsConstants, successCodes, clientErrorCodes, awsRequestId, tasksConstants} from 'JsTaskManager-commons-layer'
-import { tasksQueries, Mysql, Tasks, usersTasksQueries } from 'JsTaskManager-mysql-layer';
+import { tasksQueries, Mysql, Tasks, usersTasksQueries, usersQueries} from 'JsTaskManager-mysql-layer';
 import { taskToDTO } from '../DTO/taskToDTO.js';
 
 export const create = async (req, res) => {
@@ -13,17 +13,17 @@ export const create = async (req, res) => {
 
         const newTask = Tasks.createEntity(taskBody);
 
-        await Mysql.execute(tasksQueries.add, [
-            newTask.id,
-            newTask.title,
-            newTask.fullDescription,
-            newTask.shortDescription,
-            newTask.dueTo,
-            newTask.createdAt,
-            newTask.updatedAt
-        ])
+        // await Mysql.execute(tasksQueries.add, [
+        //     newTask.id,
+        //     newTask.title,
+        //     newTask.fullDescription,
+        //     newTask.shortDescription,
+        //     newTask.dueTo,
+        //     newTask.createdAt,
+        //     newTask.updatedAt
+        // ])
 
-         //TODO replace "username" to "id" by calling the getIdByUsername querie 
+         //TODO test tasksToMap, once DB is up
          
         const taskMaped = tasksToMap(req.body.assignees, newTask);
         
@@ -38,8 +38,11 @@ export const create = async (req, res) => {
     }
 }
 
-const tasksToMap = (users, tasks) => {
-    return users.map(user => {
-       return `("${user}", "${tasks.id}", ${tasks.createdAt})`
-    })
+const tasksToMap = async (users, tasks) => {
+    return await Promise.all(
+        users.map(async (user) => {
+            const userId =  await Mysql.execute(usersQueries.getIdByUserName, user);
+        return `("${userId}", "${tasks.id}", ${tasks.createdAt})`
+        })
+    )
 }
