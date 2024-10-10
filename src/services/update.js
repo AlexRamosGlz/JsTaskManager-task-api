@@ -19,6 +19,7 @@ export const update = async (req, res) => {
             shortDescription: req.body.shortDescription ?? task.shortDescription,
             dueTo: req.body.dueTo ?? task.dueTo,
             status: req.body.status ?? task.status,
+            status: req.body.status ?? task.status,
             updatedAt: new Date()
         }
 
