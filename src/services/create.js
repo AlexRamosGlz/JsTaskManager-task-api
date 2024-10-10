@@ -9,27 +9,30 @@ export const create = async (req, res) => {
             fullDescription: req.body.fullDescription,
             shortDescription: req.body.shortDescription,
             dueTo: req.body.dueTo,
+            status: req.body.status
         }
 
         const newTask = Tasks.createEntity(taskBody);
 
-        // await Mysql.execute(tasksQueries.add, [
-        //     newTask.id,
-        //     newTask.title,
-        //     newTask.fullDescription,
-        //     newTask.shortDescription,
-        //     newTask.dueTo,
-        //     newTask.createdAt,
-        //     newTask.updatedAt
-        // ])
+        await Mysql.execute(tasksQueries.add, [
+            newTask.id,
+            newTask.title,
+            newTask.fullDescription,
+            newTask.shortDescription,
+            newTask.dueTo,
+            newTask.status,
+            newTask.createdAt,
+            newTask.updatedAt
+        ])
 
          //TODO test tasksToMap, once DB is up
-         
-        const taskMaped = tasksToMap(req.body.assignees, newTask);
+        const taskMaped = await tasksToMap(req.body.assignees, newTask);
         
         await Mysql.execute(usersTasksQueries.add(taskMaped));
 
-        const taskDTO = taskToDTO(newTask);
+        const task  = await Mysql.execute(usersTasksQueries.getByTaskId, newTask.id);        
+
+        const taskDTO = taskToDTO(task);
 
         response.success(res, req.awsRequestId, taskDTO, tasksConstants.TASK_CREATED, successCodes.CREATED);
     }catch(error) {
@@ -41,8 +44,8 @@ export const create = async (req, res) => {
 const tasksToMap = async (users, tasks) => {
     return await Promise.all(
         users.map(async (user) => {
-            const userId =  await Mysql.execute(usersQueries.getIdByUserName, user);
-        return `("${userId}", "${tasks.id}", ${tasks.createdAt})`
+            const [userId] =  await Mysql.execute(usersQueries.getIdByUserName, user);
+        return `('${userId.id}', '${tasks.id}')`
         })
     )
 }

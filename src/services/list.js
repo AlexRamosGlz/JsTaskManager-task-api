@@ -5,6 +5,8 @@ export const list = async (req, res) => {
     try {
         const tasks = await Mysql.execute(tasksQueries.list);
 
+        //TODO list all task with it's assignees
+
         response.success(res, req.awsRequestId, tasks, tasksConstants.TASKS_FOUND, successCodes.OK);
     }catch(error) {
         console.error(`${tasksConstants.baseLog}${commonsConstants.LIST} ${commonsConstants.ERROR} ${error}`);

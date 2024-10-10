@@ -1,18 +1,20 @@
 import { response, commonsConstants, successCodes, clientErrorCodes, awsRequestId, tasksConstants} from 'JsTaskManager-commons-layer'
-import { tasksQueries, Mysql } from 'JsTaskManager-mysql-layer';
+import { tasksQueries, Mysql, usersTasksQueries} from 'JsTaskManager-mysql-layer';
 import { taskToDTO } from '../DTO/taskToDTO.js';
 
 export const remove = async (req, res) => {
     try {
-        const { taskId } = req.body; 
+        const taskId  = req.params.id; 
 
-        const task = await Mysql.execute(tasksQueries.getById, taskId);
+        let task = await Mysql.execute(tasksQueries.getById, taskId);
 
         if(!task) {
             console.error(`${tasksConstants.baseLog}${commonsConstants.DELETE} ${commonsConstants.ERROR} ${tasksConstants.TASKS_NOT_FOUND}`);
             throw new Error(tasksConstants.TASKS_NOT_FOUND);
         }
-
+        
+        task  = await Mysql.execute(usersTasksQueries.getByTaskId, taskId); 
+        
         await Mysql.execute(tasksQueries.remove, taskId);
 
         const taskDTO = taskToDTO(task);
